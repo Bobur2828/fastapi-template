@@ -1,3 +1,3 @@
-"""Вспомогательные функции"""
+"""Yordamchi funksiyalar"""
 
-# Здесь будут общие хелперы
+# Bu yerda umumiy yordamchi funksiyalar (helperlar) bo‘ladi

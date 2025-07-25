@@ -1,6 +1,6 @@
 """
-FastAPI приложение
-Точка входа, настройка middleware и подключение роутеров
+FastAPI ilovasi
+Kirish nuqtasi, middleware sozlamalari va marshrutlarni ulash
 """
 
 import asyncio
@@ -16,46 +16,46 @@ from middleware.error_handler import error_handler_middleware
 from middleware.logging import logging_middleware
 from modules.echo.router import router as echo_router
 
-# Настройка логирования
+# Loglashni sozlash
 setup_logging()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Управление жизненным циклом приложения"""
-    # Startup
-    logger.info(f"🚀 Запуск {settings.APP_NAME} v{settings.APP_VERSION}")
+    """Ilovaning hayotiy tsiklini boshqarish"""
+    # Ishga tushirish
+    logger.info(f"🚀 {settings.APP_NAME} v{settings.APP_VERSION} ishga tushdi")
     
-    # Инициализация БД
+    # Ma'lumotlar bazasini ishga tayyorlash
     if not await init_database():
-        logger.error("❌ Не удалось инициализировать БД. Завершение работы.")
-        raise RuntimeError("Database initialization failed")
+        logger.error("❌ Ma'lumotlar bazasini ishga tushirib bo‘lmadi. Ilova to‘xtatildi.")
+        raise RuntimeError("Ma'lumotlar bazasi ishga tushmadi")
     
-    logger.info("✅ Приложение готово к работе")
+    logger.info("✅ Ilova ishga tayyor")
     
     yield
     
-    # Shutdown
-    logger.info("🛑 Завершение работы приложения...")
+    # To‘xtatish
+    logger.info("🛑 Ilova to‘xtatilmoqda...")
     await close_database()
-    logger.info("👋 Приложение остановлено")
+    logger.info("👋 Ilova muvaffaqiyatli to‘xtatildi")
 
 
-# Создание приложения
+# Ilovani yaratish
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="FastAPI приложение с модульной архитектурой",
+    description="Modulli arxitekturaga ega FastAPI ilovasi",
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url="/redoc" if settings.DEBUG else None,
     lifespan=lifespan,
 )
 
-# Middleware (порядок важен!)
+# Middleware'lar (tartib muhim!)
 app.middleware("http")(error_handler_middleware)
 app.middleware("http")(logging_middleware)
 
-# CORS
+# CORS sozlamalari
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
@@ -64,13 +64,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Подключение роутеров
+# Routerlarni ulash
 app.include_router(echo_router, prefix="/api/echo", tags=["echo"])
 
 
 @app.get("/health")
 async def health_check():
-    """Проверка состояния сервиса и БД"""
+    """Xizmat va ma'lumotlar bazasi holatini tekshirish"""
     from core.db import check_database_connection
     
     db_status = await check_database_connection()
@@ -79,16 +79,16 @@ async def health_check():
         "status": "ok" if db_status else "warning",
         "service": settings.APP_NAME,
         "version": settings.APP_VERSION,
-        "database": "connected" if db_status else "disconnected"
+        "database": "ulandi" if db_status else "ulanmadi"
     }
 
 
 @app.get("/")
 async def root():
-    """Корневой endpoint"""
+    """Ilovaning asosiy endpointi"""
     return {
-        "message": f"Welcome to {settings.APP_NAME}!",
+        "message": f"{settings.APP_NAME} ilovasiga xush kelibsiz!",
         "version": settings.APP_VERSION,
-        "docs": "/docs" if settings.DEBUG else "Documentation disabled in production",
+        "docs": "/docs" if settings.DEBUG else "Ishlab chiqarish rejimida hujjatlar o‘chirib qo‘yilgan",
         "health": "/health"
     }

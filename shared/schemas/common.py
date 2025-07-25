@@ -1,6 +1,6 @@
 """
-Общие схемы для всего приложения
-Базовые модели ответов, пагинация и тд
+Ilovaning umumiy sxemalari
+Javoblar, sahifalash (pagination) va boshqa umumiy modellar
 """
 
 from typing import Generic, TypeVar, Optional, List, Any, Dict
@@ -12,14 +12,14 @@ T = TypeVar('T')
 
 
 class ResponseModel(BaseModel, Generic[T]):
-    """Базовая модель успешного ответа"""
+    """Muvaffaqiyatli javob uchun asosiy model"""
     status: str = "ok"
     data: T
     message: Optional[str] = None
 
 
 class ErrorResponse(BaseModel):
-    """Модель ошибки"""
+    """Xatolik javobi uchun model"""
     status: str = "error"
     message: str
     error_code: Optional[int] = None
@@ -27,33 +27,33 @@ class ErrorResponse(BaseModel):
 
 
 class PaginationParams(BaseModel):
-    """Параметры пагинации"""
-    page: int = Field(1, ge=1, description="Номер страницы")
-    page_size: int = Field(20, ge=1, le=100, description="Количество элементов на странице")
-    
+    """Sahifalash parametrlar modeli"""
+    page: int = Field(1, ge=1, description="Sahifa raqami")
+    page_size: int = Field(20, ge=1, le=100, description="Sahifadagi elementlar soni")
+
     @property
     def skip(self) -> int:
-        """Количество элементов для пропуска"""
+        """Qancha elementni o'tkazib yuborish (offset)"""
         return (self.page - 1) * self.page_size
-    
+
     @property
     def limit(self) -> int:
-        """Лимит элементов для запроса"""
+        """So'rovdagi maksimal elementlar soni (limit)"""
         return self.page_size
 
 
 class PaginatedResponse(BaseModel, Generic[T]):
-    """Ответ с пагинацией"""
+    """Sahifalangan javob modeli"""
     status: str = "ok"
     items: List[T]
     total: int
     page: int
     page_size: int
     pages: int
-    
+
     @classmethod
     def create(cls, items: List[T], total: int, pagination: PaginationParams):
-        """Создать ответ с пагинацией"""
+        """Sahifalangan javob yaratish"""
         pages = (total + pagination.page_size - 1) // pagination.page_size
         return cls(
             items=items,
@@ -65,11 +65,11 @@ class PaginatedResponse(BaseModel, Generic[T]):
 
 
 class BaseSchema(BaseModel):
-    """Базовая схема с общими полями"""
+    """Umumiy maydonlarga ega asosiy sxema"""
     id: uuid.UUID
     created_at: datetime
     updated_at: datetime
-    
+
     class Config:
         from_attributes = True
         json_encoders = {
@@ -79,7 +79,7 @@ class BaseSchema(BaseModel):
 
 
 class HealthResponse(BaseModel):
-    """Ответ health check"""
+    """Sog‘liqni tekshirish (health check) javobi"""
     status: str
     service: str
     version: str
@@ -88,21 +88,21 @@ class HealthResponse(BaseModel):
 
 
 class CreateResponse(BaseModel):
-    """Ответ при создании ресурса"""
+    """Resurs yaratilgandagi javob"""
     status: str = "ok"
-    message: str = "Resource created successfully"
+    message: str = "Resurs muvaffaqiyatli yaratildi"
     id: uuid.UUID
 
 
 class UpdateResponse(BaseModel):
-    """Ответ при обновлении ресурса"""
+    """Resurs yangilanganidagi javob"""
     status: str = "ok"
-    message: str = "Resource updated successfully"
+    message: str = "Resurs muvaffaqiyatli yangilandi"
     id: uuid.UUID
 
 
 class DeleteResponse(BaseModel):
-    """Ответ при удалении ресурса"""
+    """Resurs o‘chirilgandagi javob"""
     status: str = "ok"
-    message: str = "Resource deleted successfully"
+    message: str = "Resurs muvaffaqiyatli o‘chirildi"
     id: uuid.UUID

@@ -1,183 +1,163 @@
-# FastAPI Project
+# 🚀 FastAPI Ilovasi
 
-Проект создан с помощью FastAPI Template Generator.
+Bu loyiha `FastAPI` asosida ishlab chiqilgan zamonaviy, modulli backend ilova bo‘lib, PostgreSQL yoki SQLite bilan ishlash, JWT himoya, asinxron ishlov, va modulli arxitektura bilan jihozlangan.
 
-## Структура проекта
+---
+
+## 📁 Loyiha tuzilmasi
+
 
 ```
 app/
-├── app.py                 # Точка входа приложения
-├── core/                  # Ядро приложения
-│   ├── settings.py       # Настройки через pydantic-settings
-│   ├── db.py            # Конфигурация базы данных
-│   ├── logger.py        # Настройка логирования
-│   └── dependencies.py  # Общие зависимости
-├── middleware/           # Middleware компоненты
-│   ├── error_handler.py # Обработка ошибок
-│   ├── logging.py       # Логирование запросов
-│   └── cors.py          # CORS настройки
-├── shared/              # Общие компоненты
-│   ├── schemas/         # Базовые схемы
-│   └── models/          # Базовые модели
-├── modules/             # Бизнес модули
-│   └── echo/           # Пример модуля
-├── utils/               # Утилиты
-└── logs/                # Логи
+├── app.py # Ilovaning ishga tushish nuqtasi
+├── core/ # Yadro konfiguratsiyasi
+│ ├── settings.py # Muhit sozlamalari (pydantic)
+│ ├── db.py # Ma'lumotlar bazasi konfiguratsiyasi
+│ ├── logger.py # Loglash konfiguratsiyasi
+│ └── dependencies.py # Umumiy bog‘liqliklar
+├── middleware/ # Middleware komponentlar
+│ ├── error_handler.py # Xatolarni ushlash
+│ ├── logging.py # So‘rov loglash
+│ └── cors.py # CORS sozlamalari
+├── shared/ # Umumiy sxemalar va modellar
+│ ├── schemas/ # Bazaviy Pydantic sxemalar
+│ └── models/ # Bazaviy SQLAlchemy modellar
+├── modules/ # Biznes modullar
+│ └── echo/ # Misol modul
+├── utils/ # Yordamchi funksiyalar
+└── logs/ # Log fayllar
 ```
 
 ## Установка и запуск
 
-### Локально
+## ⚙️ O‘rnatish va ishga tushirish
+
+### 🖥️ Lokal usulda
 
 ```bash
-# Установка зависимостей
+# Virtual muhit yaratish
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate     # Windows: venv\Scripts\activate
+
+# Bog‘liqliklarni o‘rnatish
 pip install -r requirements.txt
 
-# Настройка окружения
+# .env faylini yaratish
 cp .env.example .env
-# Отредактировать .env файл
+# .env faylini tahrir qiling
 
-# Запуск
+# Ilovani ishga tushirish
 uvicorn app:app --reload
-```
 
-### Docker
-
-```bash
-# Запуск с базой данных
+# Docker Compose orqali Baza bilan
 docker-compose up -d
 
-# Только приложение
+# Faqat ilovani ishga tushirish
 docker build -t fastapi-app .
 docker run -p 8000:8000 fastapi-app
-```
 
-## Использование
 
-### API Документация
+### API hujjatlari
 
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
-### Health Check
-
-- Health endpoint: http://localhost:8000/health
-
-### Примеры запросов
 
 ```bash
-# Публичный эндпоинт
+# Ochiq endpoint
 curl -X POST http://localhost:8000/api/echo/ \
      -H "Content-Type: application/json" \
-     -d '{"message": "Hello World"}'
+     -d '{"message": "Salom Dunyo"}'
 
-# Защищенный эндпоинт (требует Bearer токен)
+# Himoyalangan endpoint (Bearer token talab qilinadi)
 curl -X POST http://localhost:8000/api/echo/protected \
      -H "Content-Type: application/json" \
-     -H "Authorization: Bearer your-bearer-token" \
-     -d '{"message": "Protected Hello"}'
+     -H "Authorization: Bearer sizning-tokeningiz" \
+     -d '{"message": "Himoyalangan salom"}'
 ```
 
-## Разработка
+## Dasturlash
 
-### Форматирование кода
+### Yangi modul yaratish
 
-```bash
-make format  # Автоформатирование
-make lint    # Проверка стиля
-```
+1. modules/ papkasida yangi papka yarating
+2. Quyidagi fayllarni yarating: router.py, schemas.py, services.py, models.py
+3. app.py faylida yangi router'ni ulang
 
-### Создание нового модуля
-
-1. Создайте папку в `modules/`
-2. Добавьте файлы: `router.py`, `schemas.py`, `services.py`, `models.py`
-3. Подключите роутер в `app.py`
-
-### Работа с базой данных
+### Ma'lumotlar bazasi bilan ishlash
 
 ```bash
-# Создать новую миграцию
-make db-revision MSG="Описание изменений"
+# Yangi migratsiya yaratish
+make db-revision MSG="O‘zgarishlar tavsifi"
 
-# Применить миграции
+# Migratsiyalarni qo‘llash
 make db-upgrade
 
-# Откатить миграции
+# Migratsiyani bekor qilish
 make db-downgrade
 ```
 
-## Настройки
+## Sozlamalar
 
-Все настройки в файле `.env`:
+Barcha sozlamalar .env faylida saqlanadi:
 
-- `APP_DATABASE_URL` - строка подключения к БД
-- `APP_BEARER_TOKEN` - токен для защищенных эндпоинтов
-- `APP_DEBUG` - режим отладки
-- `APP_ALLOWED_ORIGINS` - разрешенные origins для CORS
+- `APP_DATABASE_URL` - Ma'lumotlar bazasiga ulanish satri
+- `APP_BEARER_TOKEN` - Himoyalangan endpointlar uchun token
+- `APP_DEBUG` - Debug rejimi
+- `APP_ALLOWED_ORIGINS` - CORS uchun ruxsat etilgan manbalar
 
-## Логирование
+##  Loglash
 
-Логи пишутся в:
-- Консоль (для разработки)
-- `logs/app.log` (все логи)
-- `logs/app_errors.log` (только ошибки)
+Loglar quyidagi joylarga yoziladi:
+- Konsolga (dasturlashda)
+- `logs/app.log` barcha loglar
+- `logs/app_errors.log` faqat xatoliklar
 
-## Особенности
+## Xususiyatlar
 
-### Модульная архитектура
+### Modulli arxitektura
 
-Каждый модуль содержит:
-- `router.py` - API эндпоинты
-- `schemas.py` - Pydantic модели
-- `services.py` - бизнес-логика
-- `models.py` - ORM модели
-- `funcs.py` - вспомогательные функции
+Har bir modul quyidagilarni o‘z ichiga oladi:
+- `router.py` - API endpointlar
+- `schemas.py` - Pydantic sxemalari
+- `services.py` - Biznes mantiq
+- `models.py` - ORM modellar
+- `funcs.py` - Yordamchi funksiyalar (ixtiyoriy)
 
-### Стандартные ответы
 
-Все ответы в формате:
-```json
-{
-  "status": "ok",
-  "data": {...},
-  "message": "Optional message"
-}
-```
 
-### Базовые модели
+### Bazaviy modellar
 
-Все модели БД наследуются от `BaseModel` и содержат:
+Barcha ma'lumotlar bazasi modellar  `BaseModel` dan meros oladi va quyidagi ustunlarni o‘z ichiga oladi:
 - `id` (UUID)
 - `created_at` 
 - `updated_at`
-- `deleted_at` (для soft delete)
+- `deleted_at`  (yumshoq o‘chirish uchun)
 
 ### Middleware
 
-- Обработка ошибок
-- Логирование запросов
-- CORS настройки
-- Добавление заголовков ответа
+- Xatolarni avtomatik qayta ishlash
+- Har bir so‘rovni loglash
+- CORS siyosatini qo‘llash
+- Javob sarlavhalarini avtomatik qo‘shish
 
-## Безопасность
+## Xavfsizlik
 
-- Bearer токен для защищенных эндпоинтов
-- Валидация всех входных данных
-- CORS настройки
-- Логирование подозрительной активности
+- Himoyalangan endpointlar uchun Bearer token autentifikatsiyasi
+- Kiruvchi ma'lumotlarni to‘liq validatsiyalash
+- CORS orqali xavfsiz manbalarni cheklash
+- Shubhali faoliyatni loglash
 
-## Производительность
+## Ishlash samaradorligi
 
-- Async/await для всех операций
-- Connection pooling для БД
-- Оптимизированные запросы с пагинацией
-- Кеширование (при необходимости)
+- Barcha funksiyalar async/await orqali asinxron ishlaydi
+- Ma'lumotlar bazasi uchun ulanishlar pooling asosida
+- So‘rovlar paginatsiya orqali optimallashtirilgan
+- Kesh tizimi (zaruratga qarab)
 
 ## Мониторинг
 
-- Health check эндпоинт
-- Подробные логи
-- Метрики времени обработки запросов
-- Отслеживание ошибок
+- Health check endpoint
+- Keng qamrovli loglar
+- МHar bir so‘rovning ishlash vaqtini o‘lchash
+- Xatoliklarni kuzatish tizimi bilan integratsiya

@@ -1,6 +1,6 @@
 """
-Middleware для логирования запросов
-Записывает все входящие запросы и исходящие ответы
+So‘rovlarni loglash uchun middleware
+Barcha kiruvchi so‘rovlar va chiqish javoblarini yozib boradi
 """
 
 import time
@@ -9,26 +9,26 @@ from loguru import logger
 
 
 async def logging_middleware(request: Request, call_next):
-    """Middleware для логирования всех запросов"""
+    """Barcha so‘rovlarni loglash uchun middleware"""
     start_time = time.time()
     
-    # Получаем IP адрес клиента
-    client_ip = request.client.host if request.client else "unknown"
+    # Mijozning IP manzilini olish
+    client_ip = request.client.host if request.client else "nomalum"
     
-    # Логируем входящий запрос
+    # Kiruvchi so‘rovni loglash
     logger.info(
         f"→ {request.method} {request.url.path} "
-        f"from {client_ip} "
-        f"User-Agent: {request.headers.get('user-agent', 'unknown')}"
+        f"mijoz: {client_ip} "
+        f"User-Agent: {request.headers.get('user-agent', 'nomalum')}"
     )
     
-    # Обрабатываем запрос
+    # So‘rovni qayta ishlash
     response = await call_next(request)
     
-    # Время обработки
+    # Qayta ishlash vaqti (sekundda)
     process_time = time.time() - start_time
     
-    # Логируем ответ
+    # Chiquvchi javobni loglash
     log_level = "info"
     if response.status_code >= 400:
         log_level = "warning"
@@ -38,11 +38,11 @@ async def logging_middleware(request: Request, call_next):
     getattr(logger, log_level)(
         f"← {request.method} {request.url.path} "
         f"→ {response.status_code} "
-        f"in {process_time:.3f}s"
+        f"{process_time:.3f} soniyada bajarildi"
     )
     
-    # Добавляем заголовки ответа
+    # Javobga qo‘shimcha sarlavhalar qo‘shamiz
     response.headers["X-Process-Time"] = str(process_time)
-    response.headers["X-Request-ID"] = str(id(request))  # Простой ID запроса
+    response.headers["X-Request-ID"] = str(id(request))  # Oddiy so‘rov ID
     
     return response

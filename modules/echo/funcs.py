@@ -1,6 +1,6 @@
 """
-Вспомогательные функции для echo модуля
-Логика обработки данных
+Echo moduli uchun yordamchi funksiyalar
+Ma’lumotlarni qayta ishlash mantiği
 """
 
 from typing import Optional
@@ -9,30 +9,35 @@ from loguru import logger
 
 def process_message(message: str) -> str:
     """
-    Обработка сообщения
-    Пример: переворачивание строки
+    Xabarni qayta ishlash
+    Misol: matnni teskari aylantirish
     """
     if not message:
         return ""
     
-    # Простая обработка - переворачивание
+    # Oddiy qayta ishlash — matnni teskari aylantirish
     processed = message[::-1]
     
-    logger.debug(f"Processed message: {message[:20]}... -> {processed[:20]}...")
+    logger.debug(f"Qayta ishlangan xabar: {message[:20]}... -> {processed[:20]}...")
     return processed
 
 
 def validate_category(category: Optional[str]) -> bool:
-    """Валидация категории"""
+    """
+    Kategoriya nomini tekshirish (validadsiya)
+    Ruxsat etilganlar: general, test, demo, important
+    """
     if not category:
-        return True
+        return True  # Kategoriya ixtiyoriy bo‘lishi mumkin
     
     allowed_categories = ["general", "test", "demo", "important"]
     return category.lower() in allowed_categories
 
 
 def format_response(message: str, processed: str) -> dict:
-    """Форматирование ответа"""
+    """
+    API javobini formatlash
+    """
     return {
         "original": message,
         "processed": processed,

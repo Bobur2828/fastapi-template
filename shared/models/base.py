@@ -1,5 +1,5 @@
 """
-Базовые модели для наследования
+Model meros olish uchun asosiy mikslarga oid klasslar
 """
 
 from typing import Optional, List, Any, Dict
@@ -11,43 +11,43 @@ from core.db import BaseModel
 
 
 class TimestampedMixin:
-    """Миксин для моделей с временными метками"""
-    # Уже есть в BaseModel: created_at, updated_at
+    """Vaqt muhrlari bilan ishlovchi modellar uchun mixin"""
+    # BaseModel'da mavjud: created_at, updated_at
     pass
 
 
 class SoftDeleteMixin:
-    """Миксин для мягкого удаления"""
-    # Уже есть в BaseModel: deleted_at
+    """Yumshoq o‘chirish (soft delete) uchun mixin"""
+    # BaseModel'da mavjud: deleted_at
     pass
 
 
 class NamedMixin:
-    """Миксин для моделей с названием"""
-    name = Column(String(255), nullable=False)
-    description = Column(Text, nullable=True)
+    """Nom va tavsifga ega modellar uchun mixin"""
+    name = Column(String(255), nullable=False)  # Majburiy nom
+    description = Column(Text, nullable=True)   # Ixtiyoriy tavsif
 
 
 class StatusMixin:
-    """Миксин для моделей со статусом"""
-    is_active = Column(Boolean, default=True)
-    status = Column(String(50), default="active")
+    """Status va aktivlik holati uchun mixin"""
+    is_active = Column(Boolean, default=True)         # Foydalanish holati
+    status = Column(String(50), default="active")     # Status matni
 
 
 class MetadataMixin:
-    """Миксин для дополнительных данных"""
-    # Можно добавить JSON поле для метаданных
+    """Qo‘shimcha meta-ma’lumotlar uchun mixin"""
+    # Meta ma’lumotlar uchun JSON ustun qo‘shish mumkin
     # metadata = Column(JSON, nullable=True)
     pass
 
 
 class AuditMixin:
-    """Миксин для аудита изменений"""
-    created_by = Column(String(255), nullable=True)
-    updated_by = Column(String(255), nullable=True)
+    """O‘zgarishlar tarixini kuzatish uchun audit mixin"""
+    created_by = Column(String(255), nullable=True)  # Kim yaratgan
+    updated_by = Column(String(255), nullable=True)  # Kim tahrirlagan
     
     @declared_attr
     def created_by_user(cls):
-        # Связь с таблицей пользователей (когда она будет)
+        # Foydalanuvchi jadvali bilan bog‘lash (kelajakda kerak bo‘lsa)
         # return relationship("User", foreign_keys=[cls.created_by])
         pass

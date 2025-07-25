@@ -1,6 +1,6 @@
 """
-Настройка логирования через loguru
-Один раз настроить здесь, потом везде просто импортить logger
+Loglash (log yuritish)ni loguru orqali sozlash
+Bir marta shu yerda sozlanadi, keyinchalik logger ni istalgan joyda chaqirish mumkin
 """
 
 import sys
@@ -11,15 +11,16 @@ from core.settings import settings
 
 
 def setup_logging():
-    """Настройка логирования для приложения"""
-    # Удаляем стандартный handler
+    """Ilova uchun loglashni sozlash"""
+    
+    # Standart handlerni olib tashlaymiz
     logger.remove()
     
-    # Создаем папку для логов если её нет
+    # Agar loglar uchun papka mavjud bo‘lmasa — yaratamiz
     log_dir = Path(settings.LOG_FILE).parent
     log_dir.mkdir(exist_ok=True)
     
-    # Формат логов
+    # Log yozuvi formati
     log_format = (
         "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
         "<level>{level: <8}</level> | "
@@ -27,7 +28,7 @@ def setup_logging():
         "<level>{message}</level>"
     )
     
-    # Консольный вывод
+    # Konsolga chiqarish
     logger.add(
         sys.stdout,
         format=log_format,
@@ -35,18 +36,18 @@ def setup_logging():
         colorize=True,
     )
     
-    # Файловый вывод
+    # Umumiy log fayliga yozish
     logger.add(
         settings.LOG_FILE,
         format=log_format,
-        rotation="10 MB",
-        retention="7 days",
-        compression="zip",
+        rotation="10 MB",        # Har 10 MB dan keyin yangi fayl
+        retention="7 days",      # Loglar 7 kun saqlanadi
+        compression="zip",       # Eski loglar zip holatda saqlanadi
         level=settings.LOG_LEVEL,
         encoding="utf-8",
     )
     
-    # Отдельный файл для ошибок
+    # Faqat xatoliklar uchun alohida log fayl
     logger.add(
         settings.LOG_FILE.replace(".log", "_errors.log"),
         format=log_format,
@@ -57,4 +58,4 @@ def setup_logging():
         encoding="utf-8",
     )
     
-    logger.info(f"Логирование настроено. Debug: {settings.DEBUG}, Level: {settings.LOG_LEVEL}")
+    logger.info(f"Loglash sozlandi. Debug rejimi: {settings.DEBUG}, Daraja: {settings.LOG_LEVEL}")

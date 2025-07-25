@@ -1,7 +1,7 @@
 """
-Настройка базы данных и сессий
-Базовые модели с общими полями
-Инициализация и проверка подключения
+Ma'lumotlar bazasi va sessiyalarni sozlash
+Umumiy ustunlarga ega asosiy modellar
+Bazani ishga tushirish va ulanishni tekshirish
 """
 
 from datetime import datetime
@@ -16,16 +16,16 @@ import asyncio
 
 from core.settings import settings
 
-# Создание движка БД
+# Ma'lumotlar bazasi dvigatelini yaratish
 engine = create_async_engine(
     settings.DATABASE_URL,
-    echo=settings.DEBUG,  # SQL логи в debug режиме
+    echo=settings.DEBUG,  # DEBUG rejimida SQL so‘rovlarini chiqarish
     future=True,
-    pool_pre_ping=True,  # Проверка соединения перед использованием
-    pool_recycle=3600,   # Пересоздание соединений каждый час
+    pool_pre_ping=True,   # Ulanishdan oldin tekshiruv
+    pool_recycle=3600,    # Har bir soatdan keyin ulanishni yangilash
 )
 
-# Фабрика сессий
+# Sessiya fabrikasi
 SessionLocal = sessionmaker(
     engine,
     class_=AsyncSession,
@@ -33,21 +33,21 @@ SessionLocal = sessionmaker(
     autoflush=False,
 )
 
-# Базовый класс для моделей
+# Modellar uchun asosiy klass
 Base = declarative_base()
 
 
 class GUID(TypeDecorator):
-    """Тип данных для UUID"""
+    """UUID uchun maxsus ma'lumotlar turi"""
     impl = CHAR
     cache_ok = True
-    
+
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql':
             return dialect.type_descriptor(UUID())
         else:
             return dialect.type_descriptor(CHAR(32))
-    
+
     def process_bind_param(self, value, dialect):
         if value is None:
             return value
@@ -58,7 +58,7 @@ class GUID(TypeDecorator):
                 return str(uuid.UUID(value)).replace('-', '')
             else:
                 return str(value).replace('-', '')
-    
+
     def process_result_value(self, value, dialect):
         if value is None:
             return value
@@ -70,90 +70,86 @@ class GUID(TypeDecorator):
 
 class BaseModel(Base):
     """
-    Базовая модель с общими полями
-    Все модели должны наследоваться от неё
+    Umumiy ustunlarga ega asosiy model
+    Barcha modellar ushbu klassdan meros olishi kerak
     """
     __abstract__ = True
-    
+
     id = Column(GUID(), primary_key=True, default=uuid.uuid4, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
-    deleted_at = Column(DateTime(timezone=True), nullable=True)  # Для soft delete
-    
+    deleted_at = Column(DateTime(timezone=True), nullable=True)  # Soft delete uchun
+
     def soft_delete(self):
-        """Мягкое удаление записи"""
+        """Yumshoq o‘chirish funksiyasi"""
         self.deleted_at = datetime.utcnow()
-    
+
     @property
     def is_deleted(self) -> bool:
-        """Проверка удалена ли запись"""
+        """Yozuv o‘chirilganligini tekshirish"""
         return self.deleted_at is not None
 
 
+
 async def check_database_connection() -> bool:
-    """Проверка подключения к базе данных"""
+    """Ma'lumotlar bazasiga ulanishni tekshirish"""
     try:
         async with engine.begin() as conn:
             await conn.execute(text("SELECT 1"))
-        logger.info("✓ Подключение к БД успешно")
+        logger.info("✓ Ma'lumotlar bazasiga muvaffaqiyatli ulandi")
         return True
     except Exception as e:
-        logger.error(f"✗ Ошибка подключения к БД: {e}")
-        logger.error(f"URL подключения: {settings.DATABASE_URL.replace(settings.DB_PASSWORD, '***')}")
+        logger.error(f"✗ Ma'lumotlar bazasiga ulanishda xatolik: {e}")
+        logger.error(f"Ulanish manzili (parol yashirilgan): {settings.DATABASE_URL.replace(settings.DB_PASSWORD, '***')}")
         return False
 
 
 async def create_tables():
-    """Создание всех таблиц"""
+    """Barcha jadvallarni yaratish"""
     try:
-        logger.info("Создание таблиц БД...")
+        logger.info("Ma'lumotlar bazasi jadvallari yaratilmoqda...")
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-        logger.info("✓ Таблицы БД созданы успешно")
+        logger.info("✓ Barcha jadvallar muvaffaqiyatli yaratildi")
         return True
     except Exception as e:
-        logger.error(f"✗ Ошибка создания таблиц: {e}")
+        logger.error(f"✗ Jadvallarni yaratishda xatolik: {e}")
         return False
 
 
 async def drop_tables():
-    """Удаление всех таблиц"""
+    """Barcha jadvallarni o‘chirish"""
     try:
-        logger.info("Удаление таблиц БД...")
+        logger.info("Ma'lumotlar bazasi jadvallari o‘chirilyapti...")
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
-        logger.info("✓ Таблицы БД удалены успешно")
+        logger.info("✓ Barcha jadvallar muvaffaqiyatli o‘chirildi")
         return True
     except Exception as e:
-        logger.error(f"✗ Ошибка удаления таблиц: {e}")
+        logger.error(f"✗ Jadvallarni o‘chirishda xatolik: {e}")
         return False
 
 
 async def init_database():
-    """
-    Инициализация базы данных
-    Проверка подключения и создание таблиц
-    """
-    logger.info("Инициализация базы данных...")
-    
-    # Проверяем подключение
+    """Ma'lumotlar bazasini boshlang‘ich sozlash va tekshirish"""
+    logger.info("Ma'lumotlar bazasini boshlang‘ich sozlash...")
+
     if not await check_database_connection():
-        logger.error("Не удалось подключиться к БД. Проверьте настройки.")
+        logger.error("Ma'lumotlar bazasiga ulanish muvaffaqiyatsiz. Sozlamalarni tekshiring.")
         return False
-    
-    # Создаем таблицы
+
     if not await create_tables():
-        logger.error("Не удалось создать таблицы БД.")
+        logger.error("Ma'lumotlar bazasi jadvallarini yaratib bo‘lmadi.")
         return False
-    
-    logger.info("✓ База данных инициализирована успешно")
+
+    logger.info("✓ Ma'lumotlar bazasi muvaffaqiyatli sozlandi")
     return True
 
 
 async def close_database():
-    """Закрытие соединений с БД"""
+    """Ma'lumotlar bazasi bilan bog‘lanishni yopish"""
     try:
         await engine.dispose()
-        logger.info("✓ Соединения с БД закрыты")
+        logger.info("✓ Ma'lumotlar bazasi bilan barcha ulanishlar yopildi")
     except Exception as e:
-        logger.error(f"✗ Ошибка закрытия соединений с БД: {e}")
+        logger.error(f"✗ Ma'lumotlar bazasini yopishda xatolik: {e}")
